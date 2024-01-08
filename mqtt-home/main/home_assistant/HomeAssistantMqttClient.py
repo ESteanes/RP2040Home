@@ -23,26 +23,7 @@ class HomeAssistantMqttClient:
 
     def initHaDiscovery(self):
         self.haDiscoveryPayloads = [
-        #     {  # Thoughts: this should be its own class and then the class has a method to return all of the key values as a json
-        #     "name": output.name,
-        #     "availability_topic": self.topic_prefix + "/status",
-        #     "payload_available": "running",
-        #     "payload_not_available": "dead",
-        #     "device": {
-        #         "manufacturer": "Ellington Steanes",
-        #         "model": "v0",
-        #         "identifiers": [
-        #             "ES-Watering",
-        #             "ES-Watering-" + self.UUID
-        #         ],
-        #         "name": "MQTT IO"
-        #     },
-        #     "unique_id": "ES-Watering-"+self.UUID,
-        #     "state_topic": self.location+"/output/"+output.name,
-        #     "command_topic": self.location+"/output/"+output.name+"/set",
-        #     "payload_on": output.on_payload,
-        #     "payload_off": output.off_payload
-        # }
+        
         HomeAssistantDiscoveryBuilder()
         .name(output.name)
         .availability_topic(self.topic_prefix + "/status")

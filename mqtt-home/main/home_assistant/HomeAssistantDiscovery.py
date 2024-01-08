@@ -91,6 +91,28 @@ class HomeAssistantDiscovery:
         self.payload_on = payload_on
         self.payload_off = payload_off
     
+    '''
+    Should return something along the lines of:
+    {
+            "name": "output_name",
+            "availability_topic": "availability_topic",
+            "payload_available": "running",
+            "payload_not_available": "dead",
+            "device": {
+                "manufacturer": "manufacturer_name",
+                "model": "v0",
+                "identifiers": [
+                    "identifier_1"
+                ],
+                "name": "device_name"
+            },
+            "unique_id": "uuid",
+            "state_topic": "state_topic",
+            "command_topic": "command_topic",
+            "payload_on": "ON",
+            "payload_off": "OFF"
+        }
+    '''
     def return_payload(self):
         return {  # Thoughts: this should be its own class and then the class has a method to return all of the key values as a json
             "name": self.name,
