@@ -1,0 +1,30 @@
+{
+    "pi": [
+        {
+            "ssid": "ssid1",
+            "password": "password1"
+        },
+        {
+            "ssid": "ssid2",
+            "password": "password2"
+        }
+    ],
+    "mqtt": {
+        "host": "<your hostname/IP address>",
+        "port": 1883,
+        "user": "",
+        "password": "",
+        "topic_prefix": "<your mqtt topic prefix>",
+        "ha_discovery": {
+            "enabled": "yes"
+        }
+    },
+    "digital_outputs": [
+        {
+            "name": "myOutput",
+            "pin": 17,
+            "on_payload": "ON",
+            "off_payload": "OFF"
+        }
+    ]
+}
