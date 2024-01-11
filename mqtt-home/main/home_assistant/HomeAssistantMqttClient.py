@@ -2,41 +2,59 @@ from umqtt.simple import MQTTClient
 from .HomeAssistantDiscovery import HomeAssistantDiscoveryBuilder
 from .HomeAssistantDiscoveryDevice import HomeAssistantDiscoveryDevice
 from ..config_parsing.Output import Output
+from ..config_parsing.ConfigParser import ConfigParser
+from ..config_parsing.HomeAssistantDiscoveryConfig import HomeAssistantDiscoveryConfig
 
 
 
 class HomeAssistantMqttClient:
-    def __init__(self, ha_discovery: bool, topic_prefix: str, UUID: str, outputs: list[Output], mqtt_server_host: str, mqtt_username: str, mqtt_password: str):
+    topic_prefix: str
+    outputs: list[Output]
+    ha_discovery: HomeAssistantDiscoveryConfig
+    location: str
+    haDiscoveryPayloads = list[map]
+    mqtt_client: MQTTClient
+    
+    def __init__(self, UUID: str, parsedConfig: ConfigParser):
         if UUID:
             self.UUID = UUID
         else:
             self.UUID = "testUUID"
-        self.topic_prefix = topic_prefix
-        self.outputs = outputs
-        self.ha_discovery = ha_discovery
-        self.location = "test"
+        self.topic_prefix = parsedConfig.mqtt_config.topic_prefix
+        self.outputs = parsedConfig.output_config
+        self.ha_discovery = parsedConfig.mqtt_config.ha_discovery
+        self.location = parsedConfig.mqtt_config.location
         self.haDiscoveryPayloads = None
-        self.mqtt_client = MQTTClient(client_id=self.UUID,server=mqtt_server_host, user=mqtt_username, password=mqtt_password)
-        if ha_discovery:
+        self.haDiscoveryTopics = None
+        self.mqtt_client = MQTTClient(
+            client_id=self.UUID,
+            server=parsedConfig.mqtt_config.host,
+            user=parsedConfig.mqtt_config.user,
+            password=parsedConfig.mqtt_config.password)
+        if self.ha_discovery.enabled != None:
             self.initHaDiscovery()
 # returns a list of HA Discovery dictionaries
 
     def initHaDiscovery(self):
         self.haDiscoveryPayloads = [
-        
-        HomeAssistantDiscoveryBuilder()
-        .name(output.name)
-        .availability_topic(self.topic_prefix + "/status")
-        .device(HomeAssistantDiscoveryDevice("Ellington Steanes", "Pico Watering Device", ["ES-Watering", "ES-Watering-"+self.UUID],"Pico MQTT"))
-        .unique_id("ES-Watering-UUID-"+self.UUID)
-        .state_topic(self.location+"/output/"+output.name)
-        .command_topic(self.location+"/output/"+output.name+"/set")
-        .payload_on(output.on_payload)
-        .payload_off(output.off_payload)
-        .build().return_payload() for output in self.outputs]
+            HomeAssistantDiscoveryBuilder()
+            .name(output.name)
+            .availability_topic(self.topic_prefix + "/status")
+            .device(
+                HomeAssistantDiscoveryDevice(
+                    "Home Assistant MQTT Client",
+                    "v0",
+                    ["Home Assistant MQTT Client", "Home Assistant MQTT Client-"+self.UUID],
+                    "Home Assistant MQTT Client")
+                )
+            .unique_id(self.UUID)
+            .state_topic(self.location+"/output/"+output.name)
+            .command_topic(self.location+"/output/"+output.name+"/set")
+            .payload_on(output.on_payload)
+            .payload_off(output.off_payload)
+            .build().return_map() for output in self.outputs]
 
-        self.haDiscoveryTopics = ["homeassistant/switch/ES-Watering-" +
-                                  self.UUID+"/"+output.name+"/config" for output in self.outputs]
+        self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
 
     def mqttStatus(self, isAvailable):
         for haDiscovery in self.haDiscoveryPayloads:
@@ -51,5 +69,5 @@ class HomeAssistantMqttClient:
         for haDiscovery in self.haDiscoveryPayloads:
             self.publish(haDiscovery["availability_topic"],haDiscovery)
 
-    def publish(self, topic: str, payload) -> None:
+    def publish(self, topic: str, payload: any) -> None:
         self.mqtt_client.publish(topic, payload)

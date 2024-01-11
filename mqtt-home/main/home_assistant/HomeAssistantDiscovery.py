@@ -113,7 +113,7 @@ class HomeAssistantDiscovery:
             "payload_off": "OFF"
         }
     '''
-    def return_payload(self):
+    def return_map(self):
         return {  # Thoughts: this should be its own class and then the class has a method to return all of the key values as a json
             "name": self.name,
             "availability_topic": self.availability_topic,
