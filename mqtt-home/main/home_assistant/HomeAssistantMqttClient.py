@@ -12,6 +12,7 @@ class HomeAssistantMqttClient:
     outputs: list[Output]
     ha_discovery: HomeAssistantDiscoveryConfig
     location: str
+    UUID: str
     haDiscoveryPayloads = list[map]
     mqtt_client: MQTTClient
     
@@ -33,9 +34,11 @@ class HomeAssistantMqttClient:
             password=parsedConfig.mqtt_config.password)
         if self.ha_discovery.enabled != None:
             self.initHaDiscovery()
-# returns a list of HA Discovery dictionaries
 
-    def initHaDiscovery(self):
+    def initHaDiscoveryTopics(self):
+        self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
+
+    def initHaDiscoveryPayloads(self):
         self.haDiscoveryPayloads = [
             HomeAssistantDiscoveryBuilder()
             .name(output.name)
@@ -54,20 +57,25 @@ class HomeAssistantMqttClient:
             .payload_off(output.off_payload)
             .build().return_map() for output in self.outputs]
 
-        self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
-
+    def initHaDiscovery(self):
+        self.initHaDiscoveryPayloads()
+        self.initHaDiscoveryTopics()
+    
     def mqttStatus(self, isAvailable):
         for haDiscovery in self.haDiscoveryPayloads:
             if isAvailable:
                 self.publish(
                     haDiscovery["availability_topic"], haDiscovery["payload_available"])
-            else:
-                self.publish(
-                    haDiscovery["availability_topic"], haDiscovery["payload_not_available"])
+                continue
+            self.publish(haDiscovery["availability_topic"], haDiscovery["payload_not_available"])
 
     def mqttHADiscoveryPost(self):
         for haDiscovery in self.haDiscoveryPayloads:
             self.publish(haDiscovery["availability_topic"],haDiscovery)
 
+    def mqttInitialise(self, isAvailable):
+        self.mqttStatus(isAvailable)
+        self.mqttInitialise()
+    
     def publish(self, topic: str, payload: any) -> None:
         self.mqtt_client.publish(topic, payload)

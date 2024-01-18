@@ -5,7 +5,8 @@ from .home_assistant.HomeAssistantMqttClient import HomeAssistantMqttClient
 if __name__ == "__main__":
     myconfig = ConfigParser()
     myconfig.load("test-config.json")
-    mydiscover = HomeAssistantMqttClient("UUID", myconfig.output_config)
+    haMqttClient = HomeAssistantMqttClient("UUID", myconfig.output_config)
+    haMqttClient.mqttInitialise(True)
     print(myconfig.wifi_config)
     print(myconfig.mqtt_config)
-    print(mydiscover.haDiscoveryPayloads)
+    print(haMqttClient.haDiscoveryPayloads)
