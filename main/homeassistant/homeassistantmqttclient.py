@@ -1,9 +1,9 @@
 from umqtt.simple import MQTTClient
-from homeassistant.homeassistantdiscovery import HomeAssistantDiscoveryBuilder
-from homeassistant.homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
-from configparsing.output import Output
-from configparsing.configparser import ConfigParser
-from configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
+from .homeassistantdiscovery import HomeAssistantDiscoveryBuilder
+from .homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
+from main.configparsing.output import Output
+from main.configparsing.configparser import ConfigParser
+from main.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
 
 
 class HomeAssistantMqttClient:
@@ -12,7 +12,7 @@ class HomeAssistantMqttClient:
     ha_discovery: HomeAssistantDiscoveryConfig
     location: str
     UUID: str
-    haDiscoveryPayloads = list[map]
+    # haDiscoveryPayloads = list[dict]
     mqtt_client: MQTTClient
     
     def __init__(self, UUID: str, parsedConfig: ConfigParser):
