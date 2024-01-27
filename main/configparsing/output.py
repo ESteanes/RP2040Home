@@ -1,5 +1,4 @@
 
-
 class Output:
     name: str
     pin: int

@@ -1,4 +1,4 @@
-from .HomeAssistantDiscoveryDevice import HomeAssistantDiscoveryDevice
+from .homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
 class HomeAssistantDiscoveryBuilder:
     def __init__(self):
         self.name = None

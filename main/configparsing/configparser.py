@@ -1,5 +1,5 @@
-from ..mqtt.MqttConfig import MqttConfig
-from .Output import Output
+from .mqttconfig import MqttConfig
+from .output import Output
 import json
 
 class ConfigParser:

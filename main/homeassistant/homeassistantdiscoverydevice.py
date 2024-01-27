@@ -1,3 +1,4 @@
+
 class HomeAssistantDiscoveryDevice:
     manufacturer = "Ellington Steanes"
     model = "v0"

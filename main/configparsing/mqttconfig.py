@@ -1,4 +1,5 @@
-from ..config_parsing.HomeAssistantDiscoveryConfig import HomeAssistantDiscoveryConfig
+from .homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
+
 class MqttConfig:
     keys = [
         'host',

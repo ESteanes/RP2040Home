@@ -1,10 +1,9 @@
 from umqtt.simple import MQTTClient
-from .HomeAssistantDiscovery import HomeAssistantDiscoveryBuilder
-from .HomeAssistantDiscoveryDevice import HomeAssistantDiscoveryDevice
-from ..config_parsing.Output import Output
-from ..config_parsing.ConfigParser import ConfigParser
-from ..config_parsing.HomeAssistantDiscoveryConfig import HomeAssistantDiscoveryConfig
-
+from homeassistant.homeassistantdiscovery import HomeAssistantDiscoveryBuilder
+from homeassistant.homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
+from configparsing.output import Output
+from configparsing.configparser import ConfigParser
+from configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
 
 
 class HomeAssistantMqttClient:
