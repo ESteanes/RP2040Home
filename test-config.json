@@ -15,8 +15,11 @@
         "user": "",
         "password": "",
         "topic_prefix": "<your mqtt topic prefix>",
+        "location": "<mqtt-client location>",
         "ha_discovery": {
-            "enabled": "yes"
+            "enabled": "yes",
+            "discovery_topic_prefix": "homeassistant/switch/<switch-type-name>"
+
         }
     },
     "digital_outputs": [
