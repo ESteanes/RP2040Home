@@ -52,7 +52,7 @@ class HomeAssistantDiscovery:
             "availability_topic": self.availability_topic,
             "payload_available": self.payload_available,
             "payload_not_available": self.payload_not_available,
-            "device": self.device.jsonPayload,
+            "device": self.device.jsonPayload(),
             "unique_id": self.unique_id,
             "state_topic": self.state_topic,
             "command_topic": self.command_topic,

@@ -14,5 +14,10 @@ if __name__ == "__main__":
         haMqttClient.mqttInitialise(True)
     else:
         print("Couldn't connect to any of the specified SSIDs, exiting")
-    
+    try:
+        while 1 and network.WLAN(network.STA_IF).isconnected():
+            haMqttClient.mqtt_client.wait_msg()
+    finally:
+        haMqttClient.mqttStatus(False)
+        haMqttClient.mqtt_client.disconnect()
 

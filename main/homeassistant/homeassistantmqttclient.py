@@ -4,7 +4,7 @@ from .homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
 from main.configparsing.output import Output
 from main.configparsing.configparser import ConfigParser
 from main.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
-
+import json
 
 class HomeAssistantMqttClient:
     topic_prefix: str
@@ -37,8 +37,6 @@ class HomeAssistantMqttClient:
         self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
 
     def initHaDiscoveryPayloads(self):
-        outputNames = [output.name for output in self.outputs]
-        print("list comprehension test: " + "".join(outputNames))
         self.haDiscoveryPayloads = [
             HomeAssistantDiscoveryBuilder()\
             .set_name(output.name)\
@@ -51,7 +49,7 @@ class HomeAssistantMqttClient:
                     "Home Assistant MQTT Client")
                 )\
             .set_unique_id(self.UUID)\
-               .set_state_topic(self.location+"/output/"+output.name)\
+            .set_state_topic(self.location+"/output/"+output.name)\
             .set_command_topic(self.location+"/output/"+output.name+"/set")\
             .set_payload_on(output.on_payload)\
             .set_payload_off(output.off_payload)\
@@ -70,11 +68,21 @@ class HomeAssistantMqttClient:
             self.publish(haDiscovery["availability_topic"], haDiscovery["payload_not_available"])
 
     def mqttHADiscoveryPost(self):
-        for haDiscovery in self.haDiscoveryPayloads:
-            self.publish(haDiscovery["availability_topic"],haDiscovery)
+        for haDiscovery, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
+            print(json.dumps(haDiscovery))
+            print(haDiscovery["availability_topic"])
+            print("discovery topic: " + haDiscoveryTopic)
+            self.publish(haDiscoveryTopic, json.dumps(haDiscovery))
+            self.mqtt_client.subscribe(haDiscoveryTopic["command_topic"])
+            # self.publish(haDiscoveryTopic, "testing123")
+
+    def new_msg(topic, msg):
+        print("Received {}".format(msg))
 
     def mqttInitialise(self, isAvailable):
+        self.mqtt_client.set_callback(self.new_msg)
         self.mqtt_client.connect()
+        self.mqttHADiscoveryPost()
         self.mqttStatus(isAvailable)
         
     
