@@ -25,6 +25,7 @@ class HomeAssistantMqttClient:
         self.location = parsedConfig.mqtt_config.location
         self.haDiscoveryPayloads = None
         self.haDiscoveryTopics = None
+        self.setTopicMap = None
         self.mqtt_client = MQTTClient(
             client_id=self.UUID,
             server=parsedConfig.mqtt_config.host,
@@ -33,10 +34,10 @@ class HomeAssistantMqttClient:
         if self.ha_discovery.enabled != None:
             self.initHaDiscovery()
 
-    def initHaDiscoveryTopics(self):
+    def initHaDiscoveryTopics(self) -> None:
         self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
 
-    def initHaDiscoveryPayloads(self):
+    def initHaDiscoveryPayloads(self) -> None:
         self.haDiscoveryPayloads = [
             HomeAssistantDiscoveryBuilder()\
             .set_name(output.name)\
@@ -54,12 +55,19 @@ class HomeAssistantMqttClient:
             .set_payload_on(output.on_payload)\
             .set_payload_off(output.off_payload)\
             .build().return_map() for output in self.outputs]
+        self.setTopicMap = {
+            self.location+"/output/"+output.name+"/set": {
+                "state_topic":self.location+"/output/"+output.name,
+                "output": output
+                } for output in self.outputs
+            }
+           
 
-    def initHaDiscovery(self):
+    def initHaDiscovery(self) -> None:
         self.initHaDiscoveryPayloads()
         self.initHaDiscoveryTopics()
     
-    def mqttStatus(self, isAvailable):
+    def mqttStatus(self, isAvailable) -> None:
         for haDiscovery in self.haDiscoveryPayloads:
             if isAvailable:
                 self.publish(
@@ -67,18 +75,31 @@ class HomeAssistantMqttClient:
                 continue
             self.publish(haDiscovery["availability_topic"], haDiscovery["payload_not_available"])
 
-    def mqttHADiscoveryPost(self):
+    def mqttHADiscoveryPost(self) -> None:
         for haDiscovery, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
             self.publish(haDiscoveryTopic, json.dumps(haDiscovery))
             self.mqtt_client.subscribe(haDiscovery["command_topic"])
 
-    def new_msg(self, topic, msg):
-        print(topic)
-        print(msg)
-        machine.Pin(15, machine.Pin.OUT).on()
+    def action(self, topic, msg) -> None:
+        topicString = topic.decode()
+        msgString = msg.decode()
+        print("Topic: " + topicString + "\nMessage: " + msgString)
+        if self.setTopicMap.get(topicString) is None:
+            return
+        topicOutput = self.setTopicMap.get(topicString).get("output")
+        topicStateTopic = self.setTopicMap.get(topicString).get("state_topic")
+        self.mqtt_client.publish(topicStateTopic, msgString)
+        if msgString == topicOutput.on_payload:
+            machine.Pin(topicOutput.pin, machine.Pin.OUT).on()
+            return
+        if msgString == topicOutput.off_payload:
+            machine.Pin(topicOutput.pin, machine.Pin.OUT).off()
+            return
+        print("did not match either on or off payload - error")
+            
 
-    def mqttInitialise(self, isAvailable):
-        self.mqtt_client.set_callback(self.new_msg)
+    def mqttInitialise(self, isAvailable) -> None:
+        self.mqtt_client.set_callback(self.action)
         self.mqtt_client.connect()
         self.mqttHADiscoveryPost()
         self.mqttStatus(isAvailable)
