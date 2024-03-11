@@ -4,7 +4,7 @@ from .homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
 from main.configparsing.output import Output
 from main.configparsing.configparser import ConfigParser
 from main.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
-import json
+import json, machine
 
 class HomeAssistantMqttClient:
     topic_prefix: str
@@ -69,15 +69,13 @@ class HomeAssistantMqttClient:
 
     def mqttHADiscoveryPost(self):
         for haDiscovery, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
-            print(json.dumps(haDiscovery))
-            print(haDiscovery["availability_topic"])
-            print("discovery topic: " + haDiscoveryTopic)
             self.publish(haDiscoveryTopic, json.dumps(haDiscovery))
-            self.mqtt_client.subscribe(haDiscoveryTopic["command_topic"])
-            # self.publish(haDiscoveryTopic, "testing123")
+            self.mqtt_client.subscribe(haDiscovery["command_topic"])
 
-    def new_msg(topic, msg):
-        print("Received {}".format(msg))
+    def new_msg(self, topic, msg):
+        print(topic)
+        print(msg)
+        machine.Pin(15, machine.Pin.OUT).on()
 
     def mqttInitialise(self, isAvailable):
         self.mqtt_client.set_callback(self.new_msg)
