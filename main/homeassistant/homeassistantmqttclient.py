@@ -63,6 +63,12 @@ class HomeAssistantMqttClient:
             }
            
 
+    def defaultOutputsToOff(self) -> None:
+        for output in self.outputs:
+            machine.Pin(output.pin, machine.Pin.OUT).off()
+        for payload in self.haDiscoveryPayloads:
+            self.mqtt_client.publish(payload["state_topic"], payload["payload_off"])
+    
     def initHaDiscovery(self) -> None:
         self.initHaDiscoveryPayloads()
         self.initHaDiscoveryTopics()
@@ -83,7 +89,7 @@ class HomeAssistantMqttClient:
     def action(self, topic, msg) -> None:
         topicString = topic.decode()
         msgString = msg.decode()
-        print("Topic: " + topicString + "\nMessage: " + msgString)
+        print("Topic: " + topicString + "; Message: " + msgString)
         if self.setTopicMap.get(topicString) is None:
             return
         topicOutput = self.setTopicMap.get(topicString).get("output")
@@ -102,6 +108,7 @@ class HomeAssistantMqttClient:
         self.mqtt_client.set_callback(self.action)
         self.mqtt_client.connect()
         self.mqttHADiscoveryPost()
+        self.defaultOutputsToOff()
         self.mqttStatus(isAvailable)
         
     

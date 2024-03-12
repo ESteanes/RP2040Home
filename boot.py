@@ -1,12 +1,9 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
-#import esp
-#esp.osdebug(None)
+
 import gc, time
-import webrepl
 import network
 from main.configparsing.configparser import ConfigParser
 
-webrepl.start()
 gc.collect()
  
  
