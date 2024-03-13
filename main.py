@@ -1,5 +1,7 @@
 from main.configparsing.configparser import ConfigParser
 from main.homeassistant.homeassistantmqttclient import HomeAssistantMqttClient
+from main.machineinteraction import IoHandler
+
 import sys, network
 
 if __name__ == "__main__":
@@ -12,6 +14,7 @@ if __name__ == "__main__":
         print(myconfig.mqtt_config)
         print(haMqttClient.haDiscoveryPayloads)
         haMqttClient.mqttInitialise(True)
+        # ioHandler = IoHandler(haMqttClient.outputs, haMqttClient.haDiscoveryTopics, haMqttClient.haDiscoveryPayloads)
     else:
         print("Couldn't connect to any of the specified SSIDs, exiting")
     try:

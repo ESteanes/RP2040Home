@@ -23,9 +23,9 @@ class HomeAssistantMqttClient:
         self.outputs = parsedConfig.output_config
         self.ha_discovery = parsedConfig.mqtt_config.ha_discovery
         self.location = parsedConfig.mqtt_config.location
-        self.haDiscoveryPayloads = None
+        self.haDiscoveryPayloads = []
         self.haDiscoveryTopics = None
-        self.setTopicMap = None
+        self.setTopicMap = {}
         self.mqtt_client = MQTTClient(
             client_id=self.UUID,
             server=parsedConfig.mqtt_config.host,
@@ -38,8 +38,10 @@ class HomeAssistantMqttClient:
         self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
 
     def initHaDiscoveryPayloads(self) -> None:
-        self.haDiscoveryPayloads = [
-            HomeAssistantDiscoveryBuilder()\
+        for output in self.outputs:
+            state_topic = self.location+"/output/"+output.name
+            command_topic = self.location+"/output/"+output.name+"/set"
+            outputDiscoveryPayload =  HomeAssistantDiscoveryBuilder()\
             .set_name(output.name)\
             .set_availability_topic(self.topic_prefix + "/status")\
             .set_device(
@@ -50,17 +52,13 @@ class HomeAssistantMqttClient:
                     "Home Assistant MQTT Client")
                 )\
             .set_unique_id(self.UUID)\
-            .set_state_topic(self.location+"/output/"+output.name)\
-            .set_command_topic(self.location+"/output/"+output.name+"/set")\
+            .set_state_topic(state_topic)\
+            .set_command_topic(command_topic)\
             .set_payload_on(output.on_payload)\
             .set_payload_off(output.off_payload)\
-            .build().return_map() for output in self.outputs]
-        self.setTopicMap = {
-            self.location+"/output/"+output.name+"/set": {
-                "state_topic":self.location+"/output/"+output.name,
-                "output": output
-                } for output in self.outputs
-            }
+            .build().return_map()
+            self.haDiscoveryPayloads.append(outputDiscoveryPayload)
+            self.setTopicMap[command_topic] = {"state_topic": state_topic, "output": output}
            
 
     def defaultOutputsToOff(self) -> None:
