@@ -1,5 +1,5 @@
 
-class HomeAssistantDiscoveryDevice:
+class DiscoveryDevice:
     manufacturer = "Ellington Steanes"
     model = "v0"
     name = "_".join([manufacturer, model, "MQTT"])
