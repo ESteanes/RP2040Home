@@ -1,27 +1,38 @@
 from main.configparsing.configparser import ConfigParser
-from main.homeassistant.homeassistantmqttclient import HomeAssistantMqttClient
-from main.machineinteraction import IoHandler
+from main.homeassistant.payloadGenerator import PayloadGenerator
+from main.homeassistant.mqttClient import MqttClient
 
-import sys, network
+import sys, network, machine
+from umqtt.simple import MQTTClient
 
 if __name__ == "__main__":
     print(sys.path)
     myconfig = ConfigParser()
     myconfig.load("config.json")
     if network.WLAN(network.STA_IF).isconnected():
-        haMqttClient = HomeAssistantMqttClient("UUID", myconfig)
+        haPayloadGenerator = PayloadGenerator("UUID", myconfig)
         print(myconfig.wifi_config)
         print(myconfig.mqtt_config)
-        print(haMqttClient.haDiscoveryPayloads)
+        print(haPayloadGenerator.getDiscoveryPayloads())
+        haMqttClient = MqttClient(
+            myconfig.output_config,
+            haPayloadGenerator.getDiscoveryPayloads(),
+            haPayloadGenerator.getDiscoveryTopics(),
+            haPayloadGenerator.getSetTopicMap(),
+            MQTTClient(
+                client_id=haPayloadGenerator.getUUID(),
+                server=myconfig.mqtt_config.host,
+                user=myconfig.mqtt_config.user,
+                password=myconfig.mqtt_config.password),
+            machine)
         haMqttClient.mqttInitialise(True)
-        # ioHandler = IoHandler(haMqttClient.outputs, haMqttClient.haDiscoveryTopics, haMqttClient.haDiscoveryPayloads)
     else:
         print("Couldn't connect to any of the specified SSIDs, exiting")
     try:
         # while 1 and network.WLAN(network.STA_IF).isconnected():
         while 1:
-            haMqttClient.mqtt_client.wait_msg()
+            haMqttClient.mqttClient.wait_msg()
     finally:
         haMqttClient.mqttStatus(False)
-        haMqttClient.mqtt_client.disconnect()
+        haMqttClient.mqttClient.disconnect()
 

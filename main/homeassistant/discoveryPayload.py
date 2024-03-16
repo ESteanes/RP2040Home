@@ -1,11 +1,11 @@
-from .homeassistantdiscoverydevice import HomeAssistantDiscoveryDevice
+from .disoveryDevice import DiscoveryDevice
         
-class HomeAssistantDiscovery:
+class DiscoveryPayload:
     name: str
     availability_topic: str
     payload_available = "running"
     payload_not_available = "dead"
-    device: HomeAssistantDiscoveryDevice
+    device: DiscoveryDevice
     unique_id: str
     state_topic: str
     command_topic: str
@@ -115,7 +115,7 @@ class HomeAssistantDiscoveryBuilder:
         return self
 
     def build(self):
-        return HomeAssistantDiscovery(
+        return DiscoveryPayload(
             self.name,
             self.availability_topic,
             self.payload_available,
