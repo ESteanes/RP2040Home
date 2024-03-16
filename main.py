@@ -5,7 +5,9 @@ from main.homeassistant.mqttClient import MqttClient
 import sys, network, machine
 from umqtt.simple import MQTTClient
 
-if __name__ == "__main__":
+def main():
+    led = machine.Pin("LED", machine.Pin.OUT)
+    led.on()
     print(sys.path)
     myconfig = ConfigParser()
     myconfig.load("config.json")
@@ -34,5 +36,8 @@ if __name__ == "__main__":
             haMqttClient.mqttClient.wait_msg()
     finally:
         haMqttClient.mqttStatus(False)
+        haMqttClient.defaultOutputsToOff()
         haMqttClient.mqttClient.disconnect()
+        led.off()
 
+main()
