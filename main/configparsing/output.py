@@ -5,7 +5,7 @@ class Output:
     on_payload: str
     off_payload: str
 
-    def __init__(self, name, pin, on_payload, off_payload):
+    def __init__(self, name: str, pin: int, on_payload: str, off_payload: str):
         self.name = name
         self.pin = pin
         self.on_payload = on_payload
