@@ -31,3 +31,6 @@ Following the [official Raspberry Pi Docs](https://projects.raspberrypi.org/en/p
 11. Manually run `boot.py` and `main.py` in Thonny to ensure that the SSID and password are correct, in addition to the Home Assistant connection.
 12. Once confirmed connected, disconnect the Pi Pico and plug it in from cold to ensure that the start up works as expected.
 13. Once the status LED is shining, that is an indication that `main.py` is running and the Pi Pico should be up and running!
+
+## Virtual Environment Setup
+* Using a virtual environment, install the python dependencies listed in `requirements.txt` by running `python -m pip install -r requirements.txt`
