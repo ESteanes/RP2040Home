@@ -25,17 +25,7 @@ class PayloadGenerator:
         self.haDiscoveryTopics = []
         self.setTopicMap = {}
         if self.ha_discovery.enabled != None:
-            self.initHaDiscovery()
-
-    def initHaDiscovery(self) -> None:
-        self.createDiscoveryPayloads()
-        self.createDiscoveryTopics()
-
-    def createDiscoveryTopics(self) -> None:
-        # 
-        self.haDiscoveryTopics = ["homeassistant/" + output.output_type + "/" 
-                                  + self.ha_discovery.node_id + "-" + self.UUID + "/"+output.name+"/config" 
-                                  for output in self.outputs]
+            self.createDiscoveryPayloads()
 
     def createDiscoveryPayloads(self) -> None:
         for output in self.outputs:
@@ -59,6 +49,7 @@ class PayloadGenerator:
             .build().return_map()
             self.haDiscoveryPayloads.append(outputDiscoveryPayload)
             self.setTopicMap[command_topic] = {"state_topic": state_topic, "output": output}
+            self.haDiscoveryTopics.append("homeassistant/" + output.output_type + "/" + self.ha_discovery.node_id + "-" + self.UUID + "/"+output.name+"/config")
            
     def getUUID(self) -> str:
         return self.UUID
