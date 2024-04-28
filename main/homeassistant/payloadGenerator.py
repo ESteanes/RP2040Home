@@ -4,7 +4,7 @@ from .disoveryDevice import DiscoveryDevice
 from main.configparsing.output import Output
 from main.configparsing.configparser import ConfigParser
 from main.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
-import json, machine
+import json, machine, ubinascii, network
 
 class PayloadGenerator:
     topic_prefix: str
@@ -12,18 +12,17 @@ class PayloadGenerator:
     ha_discovery: HomeAssistantDiscoveryConfig
     location: str
     UUID: str
+    haDiscoveryTopics: list[str]
     
-    def __init__(self, UUID: str, parsedConfig: ConfigParser):
-        if UUID:
-            self.UUID = UUID
-        else:
-            self.UUID = "testUUID"
+    def __init__(self, parsedConfig: ConfigParser):
+        # UUID cannot contain colons from mac address https://www.home-assistant.io/integrations/mqtt/#discovery-topic
+        self.UUID = "RPi2040Home-" + ubinascii.hexlify(network.WLAN().config('mac')).decode() 
         self.topic_prefix = parsedConfig.mqtt_config.topic_prefix
         self.outputs = parsedConfig.output_config
         self.ha_discovery = parsedConfig.mqtt_config.ha_discovery
         self.location = parsedConfig.mqtt_config.location
         self.haDiscoveryPayloads = []
-        self.haDiscoveryTopics = None
+        self.haDiscoveryTopics = []
         self.setTopicMap = {}
         if self.ha_discovery.enabled != None:
             self.initHaDiscovery()
@@ -33,7 +32,10 @@ class PayloadGenerator:
         self.createDiscoveryTopics()
 
     def createDiscoveryTopics(self) -> None:
-        self.haDiscoveryTopics = [self.ha_discovery.discovery_topic_prefix + self.UUID+"/"+output.name+"/config" for output in self.outputs]
+        # 
+        self.haDiscoveryTopics = ["homeassistant/" + output.output_type + "/" 
+                                  + self.ha_discovery.node_id + "-" + self.UUID + "/"+output.name+"/config" 
+                                  for output in self.outputs]
 
     def createDiscoveryPayloads(self) -> None:
         for output in self.outputs:
@@ -49,7 +51,7 @@ class PayloadGenerator:
                     ["Home Assistant MQTT Client", "Home Assistant MQTT Client-"+self.UUID],
                     "Home Assistant MQTT Client")
                 )\
-            .set_unique_id(self.UUID)\
+            .set_unique_id(self.UUID + "-" + output.name)\
             .set_state_topic(state_topic)\
             .set_command_topic(command_topic)\
             .set_payload_on(output.on_payload)\

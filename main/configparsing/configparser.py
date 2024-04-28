@@ -16,6 +16,7 @@ class ConfigParser:
             if config['digital_outputs']:
                 self.output_config = [
                     Output(
+                        x["output_type"],
                         x['name'],
                         x['pin'],
                         x['on_payload'],
@@ -30,3 +31,4 @@ class ConfigParser:
                 print(config)
             except json.JSONDecodeError as exc:
                 print(exc)
+        return self
