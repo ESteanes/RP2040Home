@@ -28,8 +28,10 @@ class MqttClient:
 
     def mqttHADiscoveryPost(self) -> None:
         for discoveryPayload, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
-            self.publish(haDiscoveryTopic, json.dumps(discoveryPayload))
+            disoveryPayloadString = json.dumps(discoveryPayload)
+            self.publish(haDiscoveryTopic, disoveryPayloadString)
             print("publishing to:" + haDiscoveryTopic)
+            print("discovery payload:" + disoveryPayloadString)
             self.mqttClient.subscribe(discoveryPayload["command_topic"])
             print("subscribing to:" + discoveryPayload["command_topic"])
 
