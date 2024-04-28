@@ -18,12 +18,12 @@
         "location": "<mqtt-client location>",
         "ha_discovery": {
             "enabled": "yes",
-            "discovery_topic_prefix": "homeassistant/switch/<switch-type-name>"
-
+            "node_id": "wateringsystem"
         }
     },
     "digital_outputs": [
         {
+            "output_type": "switch",
             "name": "myOutput",
             "pin": 17,
             "on_payload": "ON",

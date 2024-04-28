@@ -27,9 +27,13 @@ class MqttClient:
             self.publish(haDiscovery["availability_topic"], haDiscovery["payload_not_available"])
 
     def mqttHADiscoveryPost(self) -> None:
-        for haDiscovery, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
-            self.publish(haDiscoveryTopic, json.dumps(haDiscovery))
-            self.mqttClient.subscribe(haDiscovery["command_topic"])
+        for discoveryPayload, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
+            disoveryPayloadString = json.dumps(discoveryPayload)
+            self.publish(haDiscoveryTopic, disoveryPayloadString)
+            print("publishing to:" + haDiscoveryTopic)
+            print("discovery payload:" + disoveryPayloadString)
+            self.mqttClient.subscribe(discoveryPayload["command_topic"])
+            print("subscribing to:" + discoveryPayload["command_topic"])
 
     def action(self, topic, msg) -> None:
         topicString = topic.decode()

@@ -1,7 +1,8 @@
-import unittest
+import unittest, json
 from unittest.mock import mock_open, patch
-from mqtthome.main.configParsing import ConfigParser  # replace 'your_module' with the actual module name
-
+from main.configparsing.configparser import ConfigParser
+from main.configparsing.mqttconfig import MqttConfig
+from main.configparsing.output import Output
 class TestConfigParser(unittest.TestCase):
     def setUp(self):
         self.config_parser = ConfigParser()
