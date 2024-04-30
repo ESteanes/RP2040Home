@@ -2,7 +2,7 @@
 
 import gc, time
 import network
-from main.configparsing.configparser import ConfigParser
+from RP2040Home.configparsing.configparser import ConfigParser
 
 gc.collect()
  

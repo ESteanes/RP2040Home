@@ -1,9 +1,9 @@
 from umqtt.simple import MQTTClient
 from .discoveryPayload import HomeAssistantDiscoveryBuilder
 from .disoveryDevice import DiscoveryDevice
-from main.configparsing.output import Output
-from main.configparsing.configparser import ConfigParser
-from main.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
+from RP2040Home.configparsing.output import Output
+from RP2040Home.configparsing.configparser import ConfigParser
+from RP2040Home.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
 import json, machine, ubinascii, network
 
 class PayloadGenerator:
