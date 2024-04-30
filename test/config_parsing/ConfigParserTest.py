@@ -1,8 +1,8 @@
 import unittest, json
 from unittest.mock import mock_open, patch
-from main.configparsing.configparser import ConfigParser
-from main.configparsing.mqttconfig import MqttConfig
-from main.configparsing.output import Output
+from RP2040Home.configparsing.configparser import ConfigParser
+from RP2040Home.configparsing.mqttconfig import MqttConfig
+from RP2040Home.configparsing.output import Output
 class TestConfigParser(unittest.TestCase):
     def setUp(self):
         self.config_parser = ConfigParser()

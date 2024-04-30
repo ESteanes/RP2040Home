@@ -1,6 +1,6 @@
 import json, machine
 from umqtt.simple import MQTTClient
-from main.configparsing.output import Output
+from RP2040Home.configparsing.output import Output
 
 
 class MqttClient:

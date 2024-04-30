@@ -1,12 +1,12 @@
-from main.configparsing.configparser import ConfigParser
-from main.homeassistant.payloadGenerator import PayloadGenerator
-from main.homeassistant.mqttClient import MqttClient
+from RP2040Home.configparsing.configparser import ConfigParser
+from RP2040Home.homeassistant.payloadGenerator import PayloadGenerator
+from RP2040Home.homeassistant.mqttClient import MqttClient
 
 import time, network, machine
 from umqtt.simple import MQTTClient
 
 
-class Pi2040Home:
+class RP2040Home:
     config: ConfigParser
     def __init__(self, config:ConfigParser):
         self.config = config
