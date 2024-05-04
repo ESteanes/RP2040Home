@@ -27,7 +27,8 @@ jobs:
           python-version: "3.x"
           
       - name: Get Release Version from Git Tag
-        run: echo "::set-env name=RELEASE_VERSION::$(git describe --tags --abbrev=0)"
+        id: get_version
+        run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
       - name: build release distributions
         run: |
