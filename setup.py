@@ -1,12 +1,14 @@
 from setuptools import setup, find_packages
-
 from pathlib import Path
+import os
+
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+release_version = os.environ.get("RELEASE_VERSION", "0.1.0")
 setup(
 name='RP2040Home',
-version='0.1.0',
+version=release_version,
 author='Ellington S',
 author_email='',
 description='MQTT Client for RP2040 based boards which integrates into Home Assistant',
