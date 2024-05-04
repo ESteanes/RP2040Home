@@ -4,8 +4,8 @@ import os
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
-
 release_version = os.environ.get("RELEASE_VERSION", "0.1.0")
+
 setup(
 name='RP2040Home',
 version=release_version,
