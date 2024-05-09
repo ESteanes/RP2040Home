@@ -16,48 +16,29 @@ permissions:
   contents: read
 
 jobs:
-  release-build:
+  pypi-publish:
+    name: Build RP2040Home and publish to PyPI
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-          
       - name: Get Release Version from Git Tag
         id: get_version
         run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-
       - name: build release distributions
         run: |
-          # NOTE: put your own distribution build steps here.
           pip install -r requirements.txt
           python -m build
         env:
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-
       - name: upload windows dists
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
           path: dist/
-
-  pypi-publish:
-    runs-on: ubuntu-latest
-    needs:
-      - release-build
-    permissions:
-      id-token: write
-
-    steps:
-      - name: Retrieve release distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
-
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.14
-            
