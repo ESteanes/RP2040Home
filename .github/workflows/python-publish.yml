@@ -35,10 +35,10 @@ jobs:
           python -m build
         env:
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-      - name: upload windows dists
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
+      # - name: upload windows dists
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: release-dists
+      #     path: dist/
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.14
