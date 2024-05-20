@@ -1,4 +1,5 @@
 from .homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
+from RP2040Home.configparsing.configparser import ConfigParser
 
 class MqttConfig:
     keys = [
@@ -23,4 +24,4 @@ class MqttConfig:
             if key == 'ha_discovery':
                 self.ha_discovery = HomeAssistantDiscoveryConfig(**value)
                 continue
-            setattr(self, key, value)
+            setattr(self, key, ConfigParser.clean_string(value))

@@ -1,7 +1,7 @@
 from .mqttconfig import MqttConfig
 from .output import Output
 from .wificonfig import WifiConfig
-import json
+import json, re
 
 class ConfigParser:
     wifi_config: list[WifiConfig]
@@ -32,3 +32,15 @@ class ConfigParser:
             except json.JSONDecodeError as exc:
                 print(exc)
         return self
+    
+    def clean_string(self, input_string:str):
+        return self.replace_white_space(self.replace_bad_characters(input_string))
+    
+    def replace_white_space(self, input_string:str):
+        return "-".join(input_string.split())
+    # Home Assistant doesn't really like anything that doesn't fit the [a-zA-Z0-9_-] pattern https://www.home-assistant.io/integrations/mqtt/#discovery-messages
+    def replace_bad_characters(self, input_string: str):
+        pattern = re.compile("[^a-zA-Z0-9_-]")
+        cleaned_text = pattern.sub('-', input_string)
+        
+        return cleaned_text
