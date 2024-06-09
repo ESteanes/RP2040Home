@@ -1,12 +1,12 @@
-from .homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
-from RP2040Home.configparsing.configparser import ConfigParser
+from RP2040Home.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
+from RP2040Home.configparsing.inputsanitisation import InputSanitisation
 
 class MqttConfig:
     keys = [
         'host',
         'port',
         'user',
-        'passwod',
+        'password',
         'topic_prefix',
         'location',
         'ha_discovery'
@@ -24,4 +24,16 @@ class MqttConfig:
             if key == 'ha_discovery':
                 self.ha_discovery = HomeAssistantDiscoveryConfig(**value)
                 continue
-            setattr(self, key, ConfigParser.clean_string(value))
+            if key == 'location':
+                setattr(self, key, InputSanitisation().clean_string(value))
+                continue
+            # We don't want to clean anything that isn't going into Home Assistant related payloads
+            setattr(self, key, value)
+        for key in self.keys:
+            if key not in kwargs:
+                raise AttributeError("The attribute \'"+key+"\' is missing - please check your configuration file")
+            
+    def __eq__(self, other):
+        if not isinstance(other, MqttConfig):
+            return False
+        return self.__dict__ == other.__dict__
