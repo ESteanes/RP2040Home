@@ -161,3 +161,4 @@ cython_debug/
 
 # Config file which may contain secrets
 config.json
+/.vscode

@@ -1,7 +1,7 @@
 from .mqttconfig import MqttConfig
 from .output import Output
 from .wificonfig import WifiConfig
-import json
+import json, re
 
 class ConfigParser:
     wifi_config: list[WifiConfig]
