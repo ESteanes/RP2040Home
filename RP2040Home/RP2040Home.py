@@ -3,11 +3,16 @@ from RP2040Home.homeassistant.payloadGenerator import PayloadGenerator
 from RP2040Home.homeassistant.mqttClient import MqttClient
 
 import time, network, machine
+from machine import Timer
 from umqtt.simple import MQTTClient
 
 
 class RP2040Home:
+    seconds_to_ms = 1000
+    minutes_to_seconds = 60
     config: ConfigParser
+    haMqttClient: MqttClient
+
     def __init__(self, config:ConfigParser):
         self.config = config
         if config is None:
@@ -44,7 +49,7 @@ class RP2040Home:
         print(self.config.wifi_config)
         print(self.config.mqtt_config)
         print(haPayloadGenerator.getDiscoveryPayloads())
-        haMqttClient = MqttClient(
+        self.haMqttClient = MqttClient(
             self.config.output_config,
             haPayloadGenerator.getDiscoveryPayloads(),
             haPayloadGenerator.getDiscoveryTopics(),
@@ -55,13 +60,34 @@ class RP2040Home:
                 user=self.config.mqtt_config.user,
                 password=self.config.mqtt_config.password),
             machine)
-        haMqttClient.mqttInitialise(True)
+        self.haMqttClient.mqttInitialise(True)
+        return self
+        
+    def subscribe(self):
+        def my_dicovery_callback(t):
+            self.haMqttClient.mqttHADiscoveryPost()
+
+        def my_wlan_connect_callback(t):
+            self.connect_wlan()
+
+        ten_minutes_as_ms = 10*self.minutes_to_seconds*self.seconds_to_ms
+        timer_ha_discover = Timer(
+            period=ten_minutes_as_ms,
+            mode= Timer.PERIODIC,
+            callback=my_dicovery_callback)
+        timer_wlan_connect = Timer(
+            period=ten_minutes_as_ms,
+            mode= Timer.PERIODIC,
+            callback=my_wlan_connect_callback)
         
         try:
             while 1:
-                haMqttClient.mqttClient.wait_msg()
+                self.haMqttClient.mqttClient.wait_msg()
+        
         finally:
-            haMqttClient.mqttStatus(False)
-            haMqttClient.defaultOutputsToOff()
-            haMqttClient.mqttClient.disconnect()
+            self.haMqttClient.mqttStatus(False)
+            self.haMqttClient.defaultOutputsToOff()
+            self.haMqttClient.mqttClient.disconnect()
+            timer_ha_discover.deinit()
+            timer_wlan_connect.deinit()
             self.led.off()
