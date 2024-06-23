@@ -1,6 +1,7 @@
 from RP2040Home.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
 from RP2040Home.configparsing.inputsanitisation import InputSanitisation
 
+
 class MqttConfig:
     keys = [
         'host',
@@ -32,7 +33,7 @@ class MqttConfig:
         for key in self.keys:
             if key not in kwargs:
                 raise AttributeError("The attribute \'"+key+"\' is missing - please check your configuration file")
-            
+
     def __eq__(self, other):
         if not isinstance(other, MqttConfig):
             return False

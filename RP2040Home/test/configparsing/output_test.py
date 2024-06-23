@@ -18,5 +18,6 @@ class TestOutput(unittest.TestCase):
 
         self.assertEqual(list1, list2)  # Should be equal
 
+
 if __name__ == '__main__':
     unittest.main()

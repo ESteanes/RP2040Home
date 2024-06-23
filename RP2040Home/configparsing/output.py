@@ -1,5 +1,6 @@
 from RP2040Home.configparsing.inputsanitisation import InputSanitisation
 
+
 class Output:
     output_type: str
     name: str
@@ -7,7 +8,7 @@ class Output:
     on_payload: str
     off_payload: str
 
-    def __init__(self, output_type:str, name: str, pin: int, on_payload: str, off_payload: str):
+    def __init__(self, output_type: str, name: str, pin: int, on_payload: str, off_payload: str):
         self.output_type = InputSanitisation().clean_string(output_type)
         self.name = InputSanitisation().clean_string(name)
         self.pin = pin
