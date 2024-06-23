@@ -91,7 +91,7 @@ class ConfigParser_Test(unittest.TestCase):
             self.config_parser.validate_config(self.sample_data, allowed_pins, empty_output_config)
         self.assertEqual(
             str(context.exception),
-            "One or more outputs has been misconfigured,the only allowed GPIO pins are: "
+            "One or more outputs has been misconfigured, the only allowed GPIO pins are: "
             + ",".join(map(str, allowed_pins)))
         return
 
