@@ -2,7 +2,9 @@ from RP2040Home.configparsing.configparser import ConfigParser
 from RP2040Home.homeassistant.payloadGenerator import PayloadGenerator
 from RP2040Home.homeassistant.mqttClient import MqttClient
 
-import time, network, machine
+import time
+import network
+import machine
 from machine import Timer
 from umqtt.simple import MQTTClient
 
@@ -13,13 +15,13 @@ class RP2040Home:
     config: ConfigParser
     haMqttClient: MqttClient
 
-    def __init__(self, config:ConfigParser):
+    def __init__(self, config: ConfigParser):
         self.config = config
         if config is None:
             raise ValueError("Config value must be set")
         self.led = machine.Pin("LED", machine.Pin.OUT)
         self.led.on()
-        
+
     def connect_wlan(self):
         sta_if = network.WLAN(network.STA_IF)
         networkConnectTimer = 0
@@ -44,7 +46,7 @@ class RP2040Home:
             print("Couldn't connect to any of the specified SSIDs, exiting")
             self.led.off()
             return
-        
+
         haPayloadGenerator = PayloadGenerator(self.config)
         print(self.config.wifi_config)
         print(self.config.mqtt_config)
@@ -62,7 +64,7 @@ class RP2040Home:
             machine)
         self.haMqttClient.mqttInitialise(True)
         return self
-        
+
     def subscribe(self):
         def my_dicovery_callback(t):
             self.haMqttClient.mqttHADiscoveryPost()
@@ -73,17 +75,17 @@ class RP2040Home:
         ten_minutes_as_ms = 10*self.minutes_to_seconds*self.seconds_to_ms
         timer_ha_discover = Timer(
             period=ten_minutes_as_ms,
-            mode= Timer.PERIODIC,
+            mode=Timer.PERIODIC,
             callback=my_dicovery_callback)
         timer_wlan_connect = Timer(
             period=ten_minutes_as_ms,
-            mode= Timer.PERIODIC,
+            mode=Timer.PERIODIC,
             callback=my_wlan_connect_callback)
-        
+
         try:
             while 1:
                 self.haMqttClient.mqttClient.wait_msg()
-        
+
         finally:
             self.haMqttClient.mqttStatus(False)
             self.haMqttClient.defaultOutputsToOff()

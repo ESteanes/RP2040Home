@@ -1,5 +1,6 @@
 from .disoveryDevice import DiscoveryDevice
-        
+
+
 class DiscoveryPayload:
     name: str
     availability_topic: str
@@ -11,8 +12,18 @@ class DiscoveryPayload:
     command_topic: str
     payload_on: str
     payload_off: str
-    
-    def __init__(self, name:str, availability_topic:str, payload_available: str, payload_not_available: str, device: any, unique_id: str, state_topic: str, command_topic: str, payload_on: str, payload_off: str):
+
+    def __init__(self,
+                 name: str,
+                 availability_topic: str,
+                 payload_available: str,
+                 payload_not_available: str,
+                 device: any,
+                 unique_id: str,
+                 state_topic: str,
+                 command_topic: str,
+                 payload_on: str,
+                 payload_off: str):
         self.name = name
         self.availability_topic = availability_topic
         self.payload_available = payload_available
@@ -23,7 +34,7 @@ class DiscoveryPayload:
         self.command_topic = command_topic
         self.payload_on = payload_on
         self.payload_off = payload_off
-    
+
     '''
     Should return something along the lines of:
     {
@@ -47,7 +58,7 @@ class DiscoveryPayload:
         }
     '''
     def return_map(self):
-        return {  # Thoughts: this should be its own class and then the class has a method to return all of the key values as a json
+        return {
             "name": self.name,
             "availability_topic": self.availability_topic,
             "payload_available": self.payload_available,

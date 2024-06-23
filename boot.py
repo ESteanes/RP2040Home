@@ -1,12 +1,13 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
 
-import gc, time
+import gc
+import time
 import network
 from RP2040Home.configparsing.configparser import ConfigParser
 
 gc.collect()
- 
- 
+
+
 def connect():
     myconfig = ConfigParser()
     myconfig.load("config.json")
@@ -25,7 +26,8 @@ def connect():
             if sta_if.isconnected():
                 break
             networkConnectTimer = 0
-            
+
     print('Network config:', sta_if.ifconfig())
- 
+
+
 connect()

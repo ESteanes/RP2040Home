@@ -1,23 +1,31 @@
-import json, machine
+import json
+import machine
 from umqtt.simple import MQTTClient
 from RP2040Home.configparsing.output import Output
 
 
 class MqttClient:
-    def __init__(self, outputs: list[Output], haDiscoveryPayloads: list[map], haDiscoveryTopics: list[str], setTopicMap:map[map], mqttClient: MQTTClient, ioInteractor: machine) -> None:
+    def __init__(
+            self,
+            outputs: list[Output],
+            haDiscoveryPayloads: list[map],
+            haDiscoveryTopics: list[str],
+            setTopicMap: map[map],
+            mqttClient: MQTTClient,
+            ioInteractor: machine) -> None:
         self.outputs = outputs
         self.haDiscoveryPayloads = haDiscoveryPayloads
         self.haDiscoveryTopics = haDiscoveryTopics
         self.setTopicMap = setTopicMap
         self.ioInteractor = ioInteractor
         self.mqttClient = mqttClient
-            
+
     def defaultOutputsToOff(self) -> None:
         for output in self.outputs:
             self.ioInteractor.Pin(output.pin, self.ioInteractor.Pin.OUT).off()
         for payload in self.haDiscoveryPayloads:
             self.publish(payload["state_topic"], payload["payload_off"])
-    
+
     def mqttStatus(self, isAvailable) -> None:
         for haDiscovery in self.haDiscoveryPayloads:
             if isAvailable:
@@ -51,7 +59,6 @@ class MqttClient:
             self.ioInteractor.Pin(topicOutput.pin, self.ioInteractor.Pin.OUT).off()
             return
         print("did not match either on or off payload - error")
-            
 
     def mqttInitialise(self, isAvailable) -> None:
         self.mqttClient.set_callback(self.action)
@@ -59,7 +66,6 @@ class MqttClient:
         self.mqttHADiscoveryPost()
         self.defaultOutputsToOff()
         self.mqttStatus(isAvailable)
-        
-    
+
     def publish(self, topic: str, payload: any) -> None:
         self.mqttClient.publish(topic, payload)
