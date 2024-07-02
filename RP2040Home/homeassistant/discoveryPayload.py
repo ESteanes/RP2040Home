@@ -71,6 +71,36 @@ class DiscoveryPayload:
             "payload_off": self.payload_off
         }
 
+    def get_name(self) -> str:
+        return self.name
+
+    def get_availability_topic(self) -> str:
+        return self.availability_topic
+
+    def get_payload_available(self) -> str:
+        return self.payload_available
+
+    def get_payload_not_available(self) -> str:
+        return self.payload_not_available
+
+    def get_device(self):
+        return self.device
+
+    def get_unique_id(self) -> str:
+        return self.unique_id
+
+    def get_state_topic(self) -> str:
+        return self.state_topic
+
+    def get_command_topic(self) -> str:
+        return self.command_topic
+
+    def get_payload_on(self) -> str:
+        return self.payload_on
+
+    def get_payload_off(self) -> str:
+        return self.payload_off
+
 
 class HomeAssistantDiscoveryBuilder:
     def __init__(self):

@@ -24,28 +24,24 @@ class MqttClient:
     def defaultOutputsToOff(self) -> None:
         for output in self.outputs:
             self.ioInteractor.Pin(output.pin, self.ioInteractor.Pin.OUT).off()
-        for discoveryPayload in self.haDiscoveryPayloads:
-            discoveryPayload_Map = discoveryPayload.return_map()
-            self.publish(discoveryPayload_Map["state_topic"], discoveryPayload_Map["payload_off"])
+        for haDiscoveryPayload in self.haDiscoveryPayloads:
+            self.publish(haDiscoveryPayload.get_state_topic(), haDiscoveryPayload.get_payload_off)
 
     def mqttStatus(self, isAvailable) -> None:
-        for haDiscovery in self.haDiscoveryPayloads:
-            discoveryPayload_Map = haDiscovery.return_map()
+        for haDiscoveryPayload in self.haDiscoveryPayloads:
             if isAvailable:
-                self.publish(
-                    discoveryPayload_Map["availability_topic"], discoveryPayload_Map["payload_available"])
+                self.publish(haDiscoveryPayload.get_availability_topic(), haDiscoveryPayload.get_payload_available())
                 continue
-            self.publish(discoveryPayload_Map["availability_topic"], discoveryPayload_Map["payload_not_available"])
+            self.publish(haDiscoveryPayload.get_availability_topic(), haDiscoveryPayload.get_payload_not_available())
 
     def mqttHADiscoveryPost(self) -> None:
         for discoveryPayload, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
-            discoveryPayload_Map = discoveryPayload.return_map()
-            disoveryPayloadString = json.dumps(discoveryPayload_Map)
+            disoveryPayloadString = json.dumps(discoveryPayload.return_map())
             self.publish(haDiscoveryTopic, disoveryPayloadString)
             print("publishing to:" + haDiscoveryTopic)
             print("discovery discoveryPayload:" + disoveryPayloadString)
-            self.mqttClient.subscribe(discoveryPayload_Map["command_topic"])
-            print("subscribing to:" + discoveryPayload_Map["command_topic"])
+            self.mqttClient.subscribe(discoveryPayload.get_command_topic())
+            print("subscribing to:" + discoveryPayload.get_command_topic())
 
     def action(self, topic, msg) -> None:
         topicString = topic.decode()
