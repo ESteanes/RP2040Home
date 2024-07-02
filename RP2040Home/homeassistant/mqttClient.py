@@ -25,7 +25,7 @@ class MqttClient:
         for output in self.outputs:
             self.ioInteractor.Pin(output.pin, self.ioInteractor.Pin.OUT).off()
         for haDiscoveryPayload in self.haDiscoveryPayloads:
-            self.publish(haDiscoveryPayload.get_state_topic(), haDiscoveryPayload.get_payload_off)
+            self.publish(haDiscoveryPayload.get_state_topic(), haDiscoveryPayload.get_payload_off())
 
     def mqttStatus(self, isAvailable) -> None:
         for haDiscoveryPayload in self.haDiscoveryPayloads:
@@ -39,7 +39,7 @@ class MqttClient:
             disoveryPayloadString = json.dumps(discoveryPayload.return_map())
             self.publish(haDiscoveryTopic, disoveryPayloadString)
             print("publishing to:" + haDiscoveryTopic)
-            print("discovery discoveryPayload:" + disoveryPayloadString)
+            print("discovery payload:" + disoveryPayloadString)
             self.mqttClient.subscribe(discoveryPayload.get_command_topic())
             print("subscribing to:" + discoveryPayload.get_command_topic())
 
@@ -58,7 +58,7 @@ class MqttClient:
         if msgString == topicOutput.off_payload:
             self.ioInteractor.Pin(topicOutput.pin, self.ioInteractor.Pin.OUT).off()
             return
-        print("did not match either on or off discoveryPayloa - error")
+        print("did not match either on or off payload - error")
 
     def mqttInitialise(self, isAvailable) -> None:
         self.mqttClient.set_callback(self.action)
