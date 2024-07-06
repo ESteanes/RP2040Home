@@ -2,13 +2,14 @@ import json
 import machine
 from umqtt.simple import MQTTClient
 from RP2040Home.configparsing.output import Output
+from RP2040Home.homeassistant.discoveryPayload import DiscoveryPayload
 
 
 class MqttClient:
     def __init__(
             self,
             outputs: list[Output],
-            haDiscoveryPayloads: list[map],
+            haDiscoveryPayloads: list[DiscoveryPayload],
             haDiscoveryTopics: list[str],
             setTopicMap: map[map],
             mqttClient: MQTTClient,
@@ -23,25 +24,24 @@ class MqttClient:
     def defaultOutputsToOff(self) -> None:
         for output in self.outputs:
             self.ioInteractor.Pin(output.pin, self.ioInteractor.Pin.OUT).off()
-        for payload in self.haDiscoveryPayloads:
-            self.publish(payload["state_topic"], payload["payload_off"])
+        for haDiscoveryPayload in self.haDiscoveryPayloads:
+            self.publish(haDiscoveryPayload.get_state_topic(), haDiscoveryPayload.get_payload_off())
 
     def mqttStatus(self, isAvailable) -> None:
-        for haDiscovery in self.haDiscoveryPayloads:
+        for haDiscoveryPayload in self.haDiscoveryPayloads:
             if isAvailable:
-                self.publish(
-                    haDiscovery["availability_topic"], haDiscovery["payload_available"])
+                self.publish(haDiscoveryPayload.get_availability_topic(), haDiscoveryPayload.get_payload_available())
                 continue
-            self.publish(haDiscovery["availability_topic"], haDiscovery["payload_not_available"])
+            self.publish(haDiscoveryPayload.get_availability_topic(), haDiscoveryPayload.get_payload_not_available())
 
     def mqttHADiscoveryPost(self) -> None:
         for discoveryPayload, haDiscoveryTopic in zip(self.haDiscoveryPayloads, self.haDiscoveryTopics):
-            disoveryPayloadString = json.dumps(discoveryPayload)
+            disoveryPayloadString = json.dumps(discoveryPayload.return_map())
             self.publish(haDiscoveryTopic, disoveryPayloadString)
             print("publishing to:" + haDiscoveryTopic)
             print("discovery payload:" + disoveryPayloadString)
-            self.mqttClient.subscribe(discoveryPayload["command_topic"])
-            print("subscribing to:" + discoveryPayload["command_topic"])
+            self.mqttClient.subscribe(discoveryPayload.get_command_topic())
+            print("subscribing to:" + discoveryPayload.get_command_topic())
 
     def action(self, topic, msg) -> None:
         topicString = topic.decode()

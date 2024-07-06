@@ -3,6 +3,7 @@ from .disoveryDevice import DiscoveryDevice
 from RP2040Home.configparsing.output import Output
 from RP2040Home.configparsing.configparser import ConfigParser
 from RP2040Home.configparsing.homeassistantdiscoveryconfig import HomeAssistantDiscoveryConfig
+from RP2040Home.homeassistant.discoveryPayload import DiscoveryPayload
 import ubinascii
 import network
 
@@ -14,6 +15,7 @@ class PayloadGenerator:
     location: str
     UUID: str
     haDiscoveryTopics: list[str]
+    haDiscoveryPayloads: list[DiscoveryPayload]
 
     def __init__(self, parsedConfig: ConfigParser):
         # UUID cannot contain colons from mac address https://www.home-assistant.io/integrations/mqtt/#discovery-topic
@@ -25,10 +27,12 @@ class PayloadGenerator:
         self.haDiscoveryPayloads = []
         self.haDiscoveryTopics = []
         self.setTopicMap = {}
-        if self.ha_discovery.enabled is not None:
-            self.createDiscoveryPayloads()
 
-    def createDiscoveryPayloads(self) -> None:
+    def createDiscoveryPayloads(self):
+        # If discovery isn't enabled, we don't want ot create any payloads
+        if self.ha_discovery.enabled is None:
+            return self
+        
         for output in self.outputs:
             state_topic = self.location+"/output/"+output.name
             command_topic = self.location+"/output/"+output.name+"/set"
@@ -47,14 +51,14 @@ class PayloadGenerator:
                                       .set_command_topic(command_topic)
                                       .set_payload_on(output.on_payload)
                                       .set_payload_off(output.off_payload)
-                                      .build()
-                                      .return_map())
+                                      .build()) 
             self.haDiscoveryPayloads.append(outputDiscoveryPayload)
             self.setTopicMap[command_topic] = {"state_topic": state_topic, "output": output}
             self.haDiscoveryTopics.append(
                 "homeassistant/" + output.output_type +
                 "/" + self.ha_discovery.node_id + "-" + self.UUID +
                 "/"+output.name+"/config")
+        return self
 
     def getUUID(self) -> str:
         return self.UUID

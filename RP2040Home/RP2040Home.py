@@ -47,7 +47,7 @@ class RP2040Home:
             self.led.off()
             return
 
-        haPayloadGenerator = PayloadGenerator(self.config)
+        haPayloadGenerator = PayloadGenerator(self.config).createDiscoveryPayloads()
         print(self.config.wifi_config)
         print(self.config.mqtt_config)
         print(haPayloadGenerator.getDiscoveryPayloads())
